@@ -15,7 +15,7 @@ RUN ./gradlew bootJar --no-daemon
 
 
 # ---------- STAGE 2: Runtime ----------
-FROM gcr.io/distroless/java21-debian12
+FROM eclipse-temurin:21-jre-jammy
 
 WORKDIR /app
 
@@ -23,6 +23,7 @@ COPY --from=builder /app/build/libs/*.jar app.jar
 
 EXPOSE 8080
 
-USER nonroot:nonroot
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+USER appuser:appgroup
 
-ENTRYPOINT ["app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
