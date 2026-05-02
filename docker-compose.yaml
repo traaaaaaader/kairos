@@ -1,4 +1,19 @@
 services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Berlin
+    ports:
+      - "8000:8000"
+      - "9443:9443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /opt/portainer/portainer_data:/data
+    networks:
+      - kairos
+
   traefik:
     image: traefik:v3.6
     container_name: traefik
@@ -6,6 +21,8 @@ services:
     ports:
       - "80:80"
       - "8090:8080"
+    labels:
+      - traefik.enable=true
     command:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
@@ -74,4 +91,3 @@ networks:
 
 volumes:
   postgres_data:
-  traefik_letsencrypt:
