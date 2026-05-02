@@ -1,4 +1,4 @@
-package ru.trader.kairos.сonfig;
+package ru.trader.kairos.config;
 
 import lombok.Getter;
 import lombok.Setter;

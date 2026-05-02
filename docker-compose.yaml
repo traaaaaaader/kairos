@@ -1,12 +1,34 @@
 services:
+  traefik:
+    image: traefik:v3.6
+    container_name: traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "8090:8080"
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--providers.file.watch=true"
+      - "--entrypoints.web.address=:80"
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--log.level=DEBUG"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/dynamic:/etc/traefik/dynamic:ro
+    networks:
+      - kairos
+
   db:
-    image: postgres:17
+    image: postgres:17-alpine
     container_name: auth_kairos
     restart: unless-stopped
     environment:
-      POSTGRES_DB: kairos-auth
-      POSTGRES_USER: kairos-user
-      POSTGRES_PASSWORD: kairos-password
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -14,7 +36,7 @@ services:
     networks:
       - kairos
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U kairos-user -d kairos-auth"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -28,20 +50,28 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/kairos-auth
-      SPRING_DATASOURCE_USERNAME: kairos-user
-      SPRING_DATASOURCE_PASSWORD: kairos-password
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       SPRING_PROFILES_ACTIVE: docker
-      JWT_SECRET: A29qcCfi140LJPjCqzJHwlw8CmTJtrnjSwMYcp_e2Dk
+      JWT_SECRET: ${JWT_SECRET}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth.rule=PathPrefix(`/auth`)"
+      - "traefik.http.routers.auth.entrypoints=web"
+      - "traefik.http.routers.auth.middlewares=secure-headers@file,auth-rate-limit@file,cors@file"
+      - "traefik.http.services.auth.loadbalancer.server.port=8080"
     networks:
       - kairos
 
-volumes:
-  postgres_data:
-
 networks:
   kairos:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  traefik_letsencrypt:

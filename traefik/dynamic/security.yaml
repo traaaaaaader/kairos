@@ -1,0 +1,52 @@
+http:
+  middlewares:
+    # Защитные заголовки
+    secure-headers:
+      headers:
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: "no-referrer"
+        permissionsPolicy: "camera=(), microphone=(), geolocation=()"
+        customResponseHeaders:
+          X-Powered-By: ""
+          Server: ""
+
+    # Rate limiting — защита от брутфорса
+    rate-limit:
+      rateLimit:
+        average: 100
+        period: 1s
+        burst: 50
+
+    # Более жёсткий rate limit для auth эндпоинтов
+    auth-rate-limit:
+      rateLimit:
+        average: 10
+        period: 1s
+        burst: 5
+
+    # ForwardAuth — валидация JWT через auth-service
+    jwt-auth:
+      forwardAuth:
+        address: "http://auth_service:8080/auth/validate"
+        authResponseHeaders:
+          - "X-User-Id"
+          - "X-User-Email"
+        trustForwardHeader: true
+
+    # CORS
+    cors:
+      headers:
+        accessControlAllowMethods:
+          - "GET"
+          - "POST"
+          - "PUT"
+          - "DELETE"
+          - "OPTIONS"
+        accessControlAllowHeaders:
+          - "Content-Type"
+          - "Authorization"
+        accessControlAllowOriginList:
+          - "http://localhost:3000" # локальный фронтенд
+        accessControlMaxAge: 100
+        addVaryHeader: true

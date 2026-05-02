@@ -16,6 +16,6 @@ server:
   port: 8080
 
 jwt:
-  secret: A29qcCfi140LJPjCqzJHwlw8CmTJtrnjSwMYcp_e2Dk
-  access-token-expiration: 900000       # 15 минут в мс
-  refresh-token-expiration: 604800000   # 7 дней в мс
+  secret: 22h9zhSFP/BzoNumS7obh0a3IWtcdifp+7XYcQVRkho=
+  access-token-expiration: 900000 # 15 минут в мс
+  refresh-token-expiration: 604800000 # 7 дней в мс

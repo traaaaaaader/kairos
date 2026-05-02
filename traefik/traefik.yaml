@@ -1,0 +1,24 @@
+# Точки входа
+entryPoints:
+  web:
+    address: ":80"
+
+# Провайдеры
+providers:
+  docker:
+    exposedByDefault: false
+    network: kairos
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true
+
+# API и dashboard
+api:
+  dashboard: true
+  insecure: true
+
+# Логи
+log:
+  level: DEBUG
+
+accessLog: {}
