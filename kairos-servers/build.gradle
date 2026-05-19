@@ -1,0 +1,69 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.14'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'ru.trader'
+version = '0.0.1-SNAPSHOT'
+description = 'Messenger servers service'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-graphql'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'org.flywaydb:flyway-database-postgresql'
+
+    annotationProcessor 'com.querydsl:querydsl-apt:5.1.0:jakarta'
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.springframework.graphql:spring-graphql-test'
+
+    testCompileOnly 'org.projectlombok:lombok'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly 'com.h2database:h2'
+
+    testAnnotationProcessor 'org.projectlombok:lombok'
+}
+
+// Указываем куда QueryDSL генерирует Q-классы
+def generatedDir = layout.buildDirectory.dir('generated/sources/annotationProcessor/java/main')
+
+sourceSets {
+    main {
+        java {
+            srcDirs += generatedDir
+        }
+    }
+}
+
+tasks.named('compileJava') {
+    options.generatedSourceOutputDirectory = generatedDir
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

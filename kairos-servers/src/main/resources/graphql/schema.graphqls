@@ -1,0 +1,176 @@
+"""
+A server (guild) in the messenger.
+"""
+type Server {
+    """Unique identifier of the server."""
+    id: ID!
+    """Display name of the server."""
+    name: String!
+    """URL of the server icon image."""
+    iconUrl: String
+    """ID of the user who owns this server."""
+    ownerId: ID!
+    """List of channels in this server."""
+    channels: [Channel!]!
+    """List of members in this server."""
+    members: [ServerMember!]!
+    """Timestamp when the server was created."""
+    createdAt: DateTime!
+    """Timestamp when the server was last updated."""
+    updatedAt: DateTime!
+}
+
+"""
+A channel within a server.
+"""
+type Channel {
+    """Unique identifier of the channel."""
+    id: ID!
+    """ID of the server this channel belongs to."""
+    serverId: ID!
+    """Display name of the channel."""
+    name: String!
+    """Type of the channel (text or voice)."""
+    type: ChannelType!
+    """Display order position of the channel."""
+    position: Int!
+    """Timestamp when the channel was created."""
+    createdAt: DateTime!
+    """Timestamp when the channel was last updated."""
+    updatedAt: DateTime!
+}
+
+"""
+A member of a server.
+"""
+type ServerMember {
+    """ID of the server."""
+    serverId: ID!
+    """ID of the user."""
+    userId: ID!
+    """Timestamp when the user joined the server."""
+    joinedAt: DateTime!
+}
+
+"""
+An invitation to join a server.
+"""
+type ServerInvite {
+    """Unique identifier of the invite."""
+    id: ID!
+    """ID of the server this invite is for."""
+    serverId: ID!
+    """Unique invite code."""
+    code: String!
+    """ID of the user who created this invite."""
+    createdBy: ID!
+    """Timestamp when this invite expires (null if never)."""
+    expiresAt: DateTime
+    """Maximum number of uses (null if unlimited)."""
+    maxUses: Int
+    """Current number of times this invite has been used."""
+    uses: Int!
+    """Timestamp when the invite was created."""
+    createdAt: DateTime!
+}
+
+"""
+Type of channel.
+"""
+enum ChannelType {
+    """Text-based channel for messages."""
+    TEXT
+    """Voice-based channel for audio communication."""
+    VOICE
+}
+
+"""
+ISO-8601 date time with timezone offset.
+"""
+scalar DateTime
+
+type Query {
+    """Get a server by its ID. Requires membership or ownership."""
+    server(id: ID!): Server!
+    """Get all servers where the current user is a member or owner."""
+    myServers: [Server!]!
+    """Get all channels in a server. Requires membership."""
+    channels(serverId: ID!): [Channel!]!
+}
+
+type Mutation {
+    """Create a new server. The creator becomes the owner."""
+    createServer(input: CreateServerInput!): Server!
+    """Update server settings. Only the owner can update."""
+    updateServer(id: ID!, input: UpdateServerInput!): Server!
+    """Delete a server and all its channels. Only the owner can delete."""
+    deleteServer(id: ID!): Boolean!
+    """Leave a server you are a member of. Owners cannot leave; delete the server instead."""
+    leaveServer(id: ID!): Boolean!
+
+    """Create a new channel in a server. Only the owner can create."""
+    createChannel(input: CreateChannelInput!): Channel!
+    """Update channel settings. Only the server owner can update."""
+    updateChannel(id: ID!, input: UpdateChannelInput!): Channel!
+    """Delete a channel. Only the server owner can delete."""
+    deleteChannel(id: ID!): Boolean!
+
+    """Create an invitation to join a server."""
+    createInvite(input: CreateInviteInput!): ServerInvite!
+    """Join a server using an invite code."""
+    joinServer(code: String!): Server!
+}
+
+"""
+Input for creating a new server.
+"""
+input CreateServerInput {
+    """Server name (2-100 characters)."""
+    name: String!
+    """URL of the server icon image."""
+    iconUrl: String
+}
+
+"""
+Input for updating a server.
+"""
+input UpdateServerInput {
+    """New server name (2-100 characters)."""
+    name: String
+    """New server icon URL."""
+    iconUrl: String
+}
+
+"""
+Input for creating a new channel.
+"""
+input CreateChannelInput {
+    """ID of the server to create the channel in."""
+    serverId: ID!
+    """Channel name (2-100 characters)."""
+    name: String!
+    """Type of the channel."""
+    type: ChannelType!
+}
+
+"""
+Input for updating a channel.
+"""
+input UpdateChannelInput {
+    """New channel name (2-100 characters)."""
+    name: String
+    """New display position."""
+    position: Int
+}
+
+"""
+Input for creating a server invite.
+"""
+input CreateInviteInput {
+    """ID of the server to create the invite for."""
+    serverId: ID!
+    """ISO-8601 datetime when the invite expires (null for no expiry)."""
+    expiresAt: String
+    """Maximum number of uses (null for unlimited)."""
+    maxUses: Int
+}
