@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import ru.trader.kairos.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.trader.kairos.security.CookieService;
+import ru.trader.kairos.security.JwtService;
 
 @RestController
 @RequestMapping("/auth")
@@ -26,6 +28,7 @@ public class AuthController {
 
     private final UserService userService;
     private final CookieService cookieService;
+    private final JwtService jwtService;
 
     @PostMapping("/register")
     public ResponseEntity<AccessTokenResponse> register(
@@ -67,5 +70,30 @@ public class AuthController {
 
         cookieService.clearRefreshTokenCookie(response);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/validate")
+    public ResponseEntity<Void> validate(
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String token = authHeader.substring(7);
+
+        if (!jwtService.isTokenValid(token) || !jwtService.isAccessToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Long userId = jwtService.extractUserId(token);
+        String email = jwtService.extractEmail(token);
+
+        response.setHeader("X-User-Id", userId.toString());
+        response.setHeader("X-User-Email", email);
+
+        return ResponseEntity.ok().build();
     }
 }

@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import ru.trader.kairos.channel.Channel;
+import ru.trader.kairos.channel.ChannelType;
 import ru.trader.kairos.member.ServerMember;
 import ru.trader.kairos.member.ServerMemberId;
 import ru.trader.kairos.member.ServerMemberRepository;
@@ -30,7 +32,14 @@ public class ServerService {
         ServerMember member = new ServerMember();
         member.setId(new ServerMemberId(saved.getId(), ownerId));
         member.setServer(saved);
-        memberRepository.save(member);
+        saved.getMembers().add(member);
+
+        Channel channel = new Channel();
+        channel.setServer(saved);
+        channel.setName("general");
+        channel.setType(ChannelType.TEXT);
+        channel.setPosition(0);
+        saved.getChannels().add(channel);
 
         return saved;
     }

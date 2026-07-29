@@ -10,7 +10,6 @@ import ru.trader.kairos.member.ServerMemberId;
 import ru.trader.kairos.member.ServerMemberRepository;
 import ru.trader.kairos.server.Server;
 import ru.trader.kairos.server.ServerReader;
-import ru.trader.kairos.server.ServerRepository;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -21,7 +20,6 @@ public class InviteService {
 
     private final InviteReader inviteReader;
     private final ServerReader serverReader;
-    private final ServerRepository serverRepository;
     private final ServerMemberRepository memberRepository;
     private final ServerInviteRepository inviteRepository;
 
@@ -33,6 +31,10 @@ public class InviteService {
 
         if (!serverReader.isMember(serverId, userId) && !server.getOwnerId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+
+        if (maxUses != null && maxUses <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "maxUses must be positive");
         }
 
         String code = generateUniqueCode();

@@ -4,7 +4,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.trader.kairos.server.QServer;
 import ru.trader.kairos.member.QServerMember;
 
 import java.util.List;

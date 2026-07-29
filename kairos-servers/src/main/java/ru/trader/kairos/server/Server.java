@@ -1,11 +1,7 @@
 package ru.trader.kairos.server;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ru.trader.kairos.channel.Channel;
 import ru.trader.kairos.invite.ServerInvite;
 import ru.trader.kairos.member.ServerMember;
@@ -45,10 +41,10 @@ public class Server {
     @OneToMany(mappedBy = "server", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Channel> channels = new ArrayList<>();
 
-    @OneToMany(mappedBy = "server")
+    @OneToMany(mappedBy = "server", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<ServerMember> members = new ArrayList<>();
 
-    @OneToMany(mappedBy = "server")
+    @OneToMany(mappedBy = "server", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<ServerInvite> invites = new ArrayList<>();
 
     @Column(name = "created_at", nullable = false, updatable = false)

@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/auth_db
-    username: kairos-user
-    password: kairos-password
+    username: auth_user
+    password: auth_password
   jpa:
     hibernate:
       ddl-auto: validate

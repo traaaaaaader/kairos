@@ -1,6 +1,7 @@
 package ru.trader.kairos.invite;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -19,7 +20,7 @@ public class InviteController {
     private final HttpServletRequest request;
 
     @MutationMapping
-    public ServerInvite createInvite(@Argument CreateInviteInput input) {
+    public ServerInvite createInvite(@Argument @Valid CreateInviteInput input) {
         Long userId = currentUser.getId(request);
 
         OffsetDateTime expiresAt = input.expiresAt() != null

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import ru.trader.kairos.member.ServerMember;
 import ru.trader.kairos.member.ServerMemberId;
@@ -45,14 +44,14 @@ class ServerServiceTest {
         savedServer.setOwnerId(ownerId);
 
         when(serverRepository.save(any(Server.class))).thenReturn(savedServer);
-        when(memberRepository.save(any(ServerMember.class))).thenReturn(new ServerMember());
 
         Server result = serverService.createServer(input, ownerId);
 
+        assertThat(result.getMembers()).hasSize(1);
+        assertThat(result.getChannels()).hasSize(1);
         assertThat(result.getName()).isEqualTo("Test Server");
         assertThat(result.getOwnerId()).isEqualTo(ownerId);
         verify(serverRepository).save(any(Server.class));
-        verify(memberRepository).save(any(ServerMember.class));
     }
 
     @Test

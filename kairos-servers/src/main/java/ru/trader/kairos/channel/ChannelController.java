@@ -1,6 +1,7 @@
 package ru.trader.kairos.channel;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -25,13 +26,13 @@ public class ChannelController {
     }
 
     @MutationMapping
-    public Channel createChannel(@Argument CreateChannelInput input) {
+    public Channel createChannel(@Argument @Valid CreateChannelInput input) {
         Long userId = currentUser.getId(request);
         return channelService.createChannel(input, userId);
     }
 
     @MutationMapping
-    public Channel updateChannel(@Argument Long id, @Argument UpdateChannelInput input) {
+    public Channel updateChannel(@Argument Long id, @Argument @Valid UpdateChannelInput input) {
         Long userId = currentUser.getId(request);
         return channelService.updateChannel(id, input, userId);
     }

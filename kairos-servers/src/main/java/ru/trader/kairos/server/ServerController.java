@@ -1,6 +1,7 @@
 package ru.trader.kairos.server;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -31,13 +32,13 @@ public class ServerController {
     }
 
     @MutationMapping
-    public Server createServer(@Argument CreateServerInput input) {
+    public Server createServer(@Argument @Valid CreateServerInput input) {
         Long userId = currentUser.getId(request);
         return serverService.createServer(input, userId);
     }
 
     @MutationMapping
-    public Server updateServer(@Argument Long id, @Argument UpdateServerInput input) {
+    public Server updateServer(@Argument Long id, @Argument @Valid UpdateServerInput input) {
         Long userId = currentUser.getId(request);
         return serverService.updateServer(id, input, userId);
     }
